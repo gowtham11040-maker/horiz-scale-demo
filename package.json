@@ -1,0 +1,15 @@
+{
+  "name": "horiz-scale-demo",
+  "version": "1.0.0",
+  "description": "Basic horizontal scaling demo using Node.js cluster",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
