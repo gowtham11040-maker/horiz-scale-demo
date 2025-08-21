@@ -1,27 +1,28 @@
-// server.js
-const cluster = require('cluster');
-const os = require('os');
+const express = require("express");
+const os = require("os");
 
-const WORKERS = Number(process.env.WORKERS || os.cpus().length);
-const PORT = Number(process.env.PORT || 3000);
-const HOST = '0.0.0.0';
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-if (cluster.isPrimary) {
-  console.log(`Master ${process.pid} starting ${WORKERS} workers…`);
-  for (let i = 0; i < WORKERS; i++) cluster.fork();
+// Root route
+app.get("/", (req, res) => {
+  res.send("Hello from Horizontal Scaling Demo 🚀");
+});
 
-  cluster.on('exit', (worker) => {
-    console.log(`Worker ${worker.process.pid} died. Spawning a new one…`);
-    cluster.fork();
-  });
-} else {
-  const express = require('express');
-  const app = express();
+// CPU intensive route (simulate heavy work)
+app.get("/heavy", (req, res) => {
+  let sum = 0;
+  for (let i = 0; i < 1e7; i++) {
+    sum += i;
+  }
+  res.send(`Heavy task done ✅ | Sum = ${sum}`);
+});
 
-  app.get('/', (_req, res) => res.send(`Hello from worker PID ${process.pid}`));
-  app.get('/whoami', (_req, res) => res.json({ pid: process.pid, workerId: cluster.worker.id }));
+// Whoami route (shows which instance handled request)
+app.get("/whoami", (req, res) => {
+  res.send(`Handled by ${os.hostname()}`);
+});
 
-  app.listen(PORT, HOST, () => {
-    console.log(`Worker ${process.pid} listening on http://${HOST}:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
